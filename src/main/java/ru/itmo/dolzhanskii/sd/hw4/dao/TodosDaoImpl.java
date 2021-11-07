@@ -33,9 +33,11 @@ public class TodosDaoImpl implements TodosDao {
                 todosLists.put(id, todosList);
             }
         });
-        databaseUtils.executeQuery("SELECT * FROM todoslists NATURAL JOIN todos", resultSet -> {
+        databaseUtils.executeQuery(
+                "SELECT * FROM todoslists INNER JOIN todos ON todoslists.id = todos.todos_list_id ORDER BY todos.id DESC",
+                resultSet -> {
             while (resultSet.next()) {
-                long id = resultSet.getLong("id");
+                long id = resultSet.getLong(2);
                 long todosListId = resultSet.getLong("todos_list_id");
                 String name = resultSet.getString("name");
                 boolean done = resultSet.getBoolean("done");
@@ -67,7 +69,9 @@ public class TodosDaoImpl implements TodosDao {
     @Override
     public long addTodo(long todosListId, String name) {
         AtomicLong result = new AtomicLong();
-        databaseUtils.executeQuery(String.format("INSERT INTO Todos (todos_list_id, name) VALUES (%d, '%s') RETURNING id", todosListId, name), resultSet -> {
+        databaseUtils.executeQuery(
+                String.format("INSERT INTO Todos (todos_list_id, name) VALUES (%d, '%s') RETURNING id", todosListId, name),
+                resultSet -> {
             resultSet.next();
             result.set(resultSet.getLong("id"));
         });
@@ -76,6 +80,7 @@ public class TodosDaoImpl implements TodosDao {
 
     @Override
     public void markTodoDone(long todosListId, long todoId) {
-        databaseUtils.executeUpdate(String.format("UPDATE Todos SET done = TRUE WHERE todos_list_id = %d AND id = %s", todosListId, todoId));
+        databaseUtils.executeUpdate(
+                String.format("UPDATE Todos SET done = TRUE WHERE todos_list_id = %d AND id = %s", todosListId, todoId));
     }
 }

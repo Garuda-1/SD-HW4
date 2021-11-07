@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+    .newTodoList {
+        margin: 1rem;
+    }
+    .todoList {
+        margin: 1rem;
+        border: 2px solid black;
+        border-radius: 1rem;
+        max-width: 24rem;
+    }
+    .todoList div {
+        padding: 0.5rem;
+    }
+    .todoList .header {
+        border-bottom: 2px solid black;
+        text-align: center;
+    }
+    .todoList .todo {
+        display: flex;
+    }
+    .todoList .todo form {
+        width: 20%;
+    }
+    .todoList .todo form button {
+        width: 100%;
+        height: 100%;
+    }
+    .todoList .todo div {
+        width: 80%;
+    }
+    .todoList .todo .doneTodo {
+        text-decoration: line-through;
+    }
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <title>TODOs</title>
+</head>
+<body>
+
+<div class="newTodoList">
+    <form method="POST" action="/todos-lists">
+        <input type="submit" value="Create new TODOs list">
+    </form>
+</div>
+<th:block th:each="todos : ${todosLists}">
+<div class="todoList">
+    <div th:text="${todos.getId()}" class="header"></div>
+    <th:block th:each="todo : ${todos.getTodos()}">
+    <div class="todo">
+        <form method="POST" th:action="@{/todos-lists/} + ${todos.getId()} + @{/mark-done}">
+            <button type="submit" th:disabled="${todo.isDone()}" th:value="${todo.getId()}" name="id">Done</button>
+        </form>
+        <div th:class="${todo.isDone()} ? 'doneTodo' : 'notDoneTodo'" th:text="${todo.getName()}"></div>
+    </div>
+    </th:block>
+    <div>
+        <form method="POST" th:action="@{/todos-lists/} + ${todos.getId()} + @{/add}">
+            <input type="text" th:name="name"/>
+            <input type="submit" value="Create new TODO...">
+        </form>
+    </div>
+    <div>
+        <form method="POST" th:action="@{/todos-lists/} + ${todos.getId()} + @{/delete}">
+            <input type="submit" value="Delete TODOs list">
+        </form>
+    </div>
+</div>
+</th:block>
+
+</body>
+</html>
